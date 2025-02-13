@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { TouchableOpacity, Text, ActivityIndicator } from "react-native";
 import Toast from "react-native-simple-toast";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { StyleSheet } from "react-native";
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
@@ -59,12 +60,10 @@ export default function App() {
               headerRight: () => (
                 <TouchableOpacity
                   onPress={handleLogout}
-                  className="bg-black py-1.5 px-4 rounded flex flex-row items-center gap-2"
+                  style={styles.logoutButton}
                 >
-                  <Text className="text-white text-lg font-semibold">
-                    Logout
-                  </Text>
-                  <MaterialIcons name="logout" size={15} color="red" />
+                  <Text style={styles.logoutText}>Logout</Text>
+                  <MaterialIcons name="logout" size={18} color="red" />
                 </TouchableOpacity>
               ),
               headerTitleStyle: {
@@ -93,3 +92,20 @@ export default function App() {
     </NavigationContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  logoutButton: {
+    backgroundColor: "black",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  logoutText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+});

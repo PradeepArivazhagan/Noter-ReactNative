@@ -5,8 +5,8 @@ import {
   Modal,
   Text,
   Pressable,
+  StyleSheet,
   View,
-  Image,
   ActivityIndicator,
   TouchableOpacity,
 } from "react-native";
@@ -14,9 +14,10 @@ import Toast from "react-native-simple-toast";
 import { useState, useEffect } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
-import NoNotes from "../assets/NoNotes.png";
-import { FlatList } from "react-native";
 import { ScrollView } from "react-native";
+import EmptyNotes from "../components/EmptyNotes";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import Feather from "react-native-vector-icons/Feather";
 
 const HomeScreen = () => {
   const [userId, setUserId] = useState("");
@@ -160,81 +161,58 @@ const HomeScreen = () => {
       });
   }, [userId]);
 
-  //Empty Note Component - completed
-  const EmptyNote = () => {
-    return (
-      <View className="flex-1 flex-col items-center justify-between px-10 py-14">
-        <View className="flex flex-col items-center">
-          <Image className=" w-64 h-64" source={NoNotes} alt="empty note" />
-          <Text className="text-lg text-center text-gray-400 mt-10">
-            You have no notes yet. Click the "Add" button to start adding new
-            ones.
-          </Text>
-        </View>
-        <Text className="text-lg font-semibold text-gray-300 italic">
-          Created by Pradeep
-        </Text>
-      </View>
-    );
-  };
-
   return (
-    <View className="flex-1 bg-slate-50 px-6 py-5">
-      <View className="w-full flex flex-row items-center justify-between">
-        <Text className="text-2xl font-bold">Notes</Text>
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Notes</Text>
         <TouchableOpacity
           onPress={() => setCreateModalIsOpen(true)}
-          className="bg-black py-2 px-4 rounded flex flex-row items-center gap-2"
+          style={styles.addButton}
         >
           <AntDesign name="pluscircleo" size={15} color="white" />
-          <Text className="text-white font-medium">Add</Text>
+          <Text style={styles.addButtonText}>Add</Text>
         </TouchableOpacity>
         <Modal
           animationType="slide"
           transparent={true}
           visible={createModalIsOpen}
-          onRequestClose={() => {
-            setCreateModalIsOpen(!createModalIsOpen);
-          }}
+          onRequestClose={() => setCreateModalIsOpen(!createModalIsOpen)}
         >
-          <View className="flex-1 items-center justify-center">
-            <View className="bg-white m-20 rounded-md p-6 shadow-md w-[80%]">
-              <Text className="font-semibold text-2xl">New Note</Text>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text style={styles.modalTitle}>New Note</Text>
               <TextInput
                 value={title}
-                required
                 onChangeText={(newValue) => setTitle(newValue)}
-                type="text"
-                className="mt-3 bg-gray-100 py-2 px-3 w-full placeholder:text-gray-300 rounded-sm text-lg"
+                style={styles.input}
                 placeholder="Title"
               />
               <TextInput
                 value={content}
                 multiline={true}
                 numberOfLines={5}
-                required
                 onChangeText={(newValue) => setContent(newValue)}
-                type="text"
-                className="mt-2 bg-gray-100 py-2 px-3 w-full placeholder:text-gray-300 rounded-sm text-lg"
+                style={styles.textArea}
                 placeholder="Content"
               />
-              <View className="mt-4 flex flex-row item-center justify-between">
+              <View style={styles.modalActions}>
                 <Pressable
-                  onPress={() => setCreateModalIsOpen(!createModalIsOpen)}
-                  className="p-2 rounded-md flex flex-row items-center gap-2 border border-black"
+                  onPress={() => {
+                    setCreateModalIsOpen(!createModalIsOpen);
+                    setTitle("");
+                    setContent("");
+                  }}
+                  style={styles.closeButton}
                 >
                   <AntDesign name="close" size={15} />
                   <Text>Close</Text>
                 </Pressable>
-                <Pressable
-                  onPress={onCreateNote}
-                  className="bg-black py-2 px-4 rounded-md border border-black"
-                >
+                <Pressable onPress={onCreateNote} style={styles.doneButton}>
                   {loading ? (
                     <ActivityIndicator size="small" color="white" />
                   ) : (
-                    <View className="flex flex-row items-center gap-2">
-                      <Text className="text-white">Done</Text>
+                    <View style={styles.doneButtonContent}>
+                      <Text style={styles.doneButtonText}>Done</Text>
                       <AntDesign name="check" size={15} color="white" />
                     </View>
                   )}
@@ -244,77 +222,67 @@ const HomeScreen = () => {
           </View>
         </Modal>
       </View>
+
       {loading ? (
         <ActivityIndicator size="large" color="black" />
       ) : notes.length > 0 ? (
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View className="mt-6 flex flex-col gap-3">
+          <View style={styles.notesContainer}>
             {notes.map((note) => (
-              <View
-                key={note._id}
-                className="bg-white border border-slate-200 rounded-lg p-3 shadow"
-              >
-                <View className="flex flex-row justify-between items-start gap-3">
-                  <Text className="font-semibold text-xl flex-shrink">
-                    {note.title}
-                  </Text>
-                  <View className="flex flex-row items-center gap-1">
+              <View key={note._id} style={styles.noteCard}>
+                <View style={styles.noteHeader}>
+                  <Text style={styles.noteTitle}>{note.title}</Text>
+                  <View style={styles.actionsContainer}>
                     {showAction === note._id && (
-                      <View className="flex flex-row items-center gap-3 bg-gray-100 rounded-full py-1 px-3">
+                      <View style={styles.actionButtons}>
                         <Pressable
                           onPress={() => openEditModal(note._id)}
-                          className="rounded-full"
+                          style={styles.iconButton}
                         >
-                          <AntDesign name="edit" size={20} color="green" />
+                          <Feather name="edit" size={18} color="green" />
                         </Pressable>
                         <Modal
                           animationType="slide"
                           transparent={true}
                           visible={editModalIsOpen}
-                          onRequestClose={() => {
-                            setEditModalIsOpen(!editModalIsOpen);
-                          }}
+                          onRequestClose={() => setEditModalIsOpen(false)}
                         >
-                          <View className="flex-1 items-center justify-center">
-                            <View className="bg-white m-20 rounded-md p-6 shadow-md w-[80%]">
-                              <Text className="font-semibold text-2xl">
+                          <View style={styles.editModalContainer}>
+                            <View style={styles.editModalContent}>
+                              <Text style={styles.editModalTitle}>
                                 Edit Note
                               </Text>
                               <TextInput
                                 value={editTitle}
-                                required
                                 onChangeText={(editValue) =>
                                   setEditTitle(editValue)
                                 }
-                                type="text"
-                                className="mt-3 bg-gray-100 py-2 px-3 w-full placeholder:text-gray-300 rounded-sm text-lg"
+                                style={styles.editInput}
                                 placeholder="Edit Title"
+                                placeholderTextColor="#9ca3af"
                               />
                               <TextInput
                                 value={editContent}
                                 multiline={true}
                                 numberOfLines={5}
-                                required
                                 onChangeText={(editValue) =>
                                   setEditContent(editValue)
                                 }
-                                type="text"
-                                className="mt-2 bg-gray-100 py-2 px-3 w-full placeholder:text-gray-300 rounded-sm text-lg"
+                                style={[styles.editInput, styles.editTextArea]}
                                 placeholder="Edit Content"
+                                placeholderTextColor="#9ca3af"
                               />
-                              <View className="mt-4 flex flex-row item-center justify-between">
+                              <View style={styles.editModalActions}>
                                 <Pressable
-                                  onPress={() =>
-                                    setEditModalIsOpen(!setEditModalIsOpen)
-                                  }
-                                  className="p-2 rounded-md flex flex-row items-center gap-2 border border-black"
+                                  onPress={() => setEditModalIsOpen(false)}
+                                  style={styles.editCloseButton}
                                 >
                                   <AntDesign name="close" size={15} />
                                   <Text>Close</Text>
                                 </Pressable>
                                 <Pressable
                                   onPress={handleEditNote}
-                                  className="bg-black py-2 px-4 rounded-md border border-black"
+                                  style={styles.editSaveButton}
                                 >
                                   {loading ? (
                                     <ActivityIndicator
@@ -322,11 +290,13 @@ const HomeScreen = () => {
                                       color="white"
                                     />
                                   ) : (
-                                    <View className="flex flex-row items-center gap-2">
-                                      <Text className="text-white">Save</Text>
+                                    <View style={styles.editIconButtonRow}>
+                                      <Text style={styles.editSaveButtonText}>
+                                        Save
+                                      </Text>
                                       <AntDesign
                                         name="check"
-                                        size={15}
+                                        size={20}
                                         color="white"
                                       />
                                     </View>
@@ -338,17 +308,22 @@ const HomeScreen = () => {
                         </Modal>
                         <Pressable
                           onPress={() => handleDeleteNote(note._id)}
-                          className="rounded-full"
+                          style={styles.iconButton}
                         >
-                          <AntDesign name="delete" size={20} color="red" />
+                          <MaterialCommunityIcons
+                            name="delete-outline"
+                            size={22}
+                            color="red"
+                          />
                         </Pressable>
                       </View>
                     )}
                     <Pressable
                       onPress={() => onClickShowAction(note._id)}
-                      className={`p-1 text-xl ${
-                        showAction !== note._id && "bg-gray-100"
-                      } rounded-full`}
+                      style={[
+                        styles.actionToggle,
+                        showAction !== note._id && styles.hiddenAction,
+                      ]}
                     >
                       {showAction === note._id ? (
                         <AntDesign
@@ -366,16 +341,238 @@ const HomeScreen = () => {
                     </Pressable>
                   </View>
                 </View>
-                <Text className="mt-2 text-lg flex-shrink">{note.content}</Text>
+                <Text style={styles.noteContent}>{note.content}</Text>
               </View>
             ))}
           </View>
         </ScrollView>
       ) : (
-        <EmptyNote />
+        <EmptyNotes />
       )}
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
+  },
+  header: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  addButton: {
+    backgroundColor: "#000",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  addButtonText: {
+    color: "#fff",
+    fontWeight: "500",
+    fontSize: 16,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    margin: 20,
+    borderRadius: 8,
+    padding: 20,
+    width: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  modalTitle: {
+    fontSize: 22,
+    fontWeight: "600",
+  },
+  input: {
+    marginTop: 10,
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    fontSize: 18,
+  },
+  textArea: {
+    marginTop: 8,
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    fontSize: 18,
+  },
+  modalActions: {
+    marginTop: 14,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  closeButton: {
+    padding: 8,
+    borderRadius: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    borderWidth: 1,
+    borderColor: "#000",
+  },
+  doneButton: {
+    backgroundColor: "#000",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  doneButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  doneButtonText: {
+    color: "#fff",
+  },
+  notesContainer: {
+    marginTop: 24,
+    flexDirection: "column",
+    gap: 8,
+  },
+  noteCard: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 8,
+    padding: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  noteHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+  noteTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    flexShrink: 1,
+  },
+  noteContent: {
+    marginTop: 8,
+    fontSize: 18,
+    flexShrink: 1,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    backgroundColor: "#f3f4f6",
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    borderRadius: 50,
+    paddingVertical: 1,
+    paddingHorizontal: 2,
+  },
+  actionButtons: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  actionToggle: {
+    padding: 5,
+    borderRadius: 50,
+  },
+  hiddenAction: {
+    backgroundColor: "#f3f4f6",
+  },
+  iconButton: {
+    padding: 2,
+    borderRadius: 50,
+    backgroundColor: "#f3f4f6",
+  },
+  editModalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  editModalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  editModalTitle: {
+    fontSize: 22,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  editInput: {
+    backgroundColor: "#f3f4f6",
+    borderRadius: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    fontSize: 18,
+    color: "#000",
+    marginBottom: 8,
+  },
+  editTextArea: {
+    textAlignVertical: "top",
+  },
+  editModalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 8,
+  },
+  editCloseButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "black",
+    padding: 10,
+    borderRadius: 5,
+    gap: 4,
+  },
+  editSaveButton: {
+    backgroundColor: "black",
+    borderRadius: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  editSaveButtonText: {
+    color: "white",
+    marginRight: 4,
+  },
+  editIconButtonRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+});
 
 export default HomeScreen;

@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   SafeAreaView,
+  StyleSheet,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-simple-toast";
@@ -67,26 +68,26 @@ const LoginScreen = ({ onLoginSuccess }) => {
   };
 
   return (
-    <SafeAreaView className="bg-slate-50 flex-1 flex-col items-center justify-center">
-      <View className="bg-white w-[80%] py-8 px-6 rounded-md shadow-md flex flex-col items-start">
-        <Text className="text-3xl font-bold mx-auto">Login</Text>
-        <Text className="text-xl font-medium mt-4">Username</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.container}>
+        <Text style={styles.title}>Login</Text>
+        <Text style={styles.label}>Username</Text>
         <TextInput
           value={username}
           onChangeText={(newValue) => setUsername(newValue.trim())}
-          className="text-lg outline-0 bg-gray-100 py-2 px-3 rounded mt-1 w-full placeholder:text-gray-300"
-          type="text"
+          style={styles.input}
           placeholder="Enter your username"
+          placeholderTextColor="#9CA3AF"
           required
         />
-        <Text className="mt-3 text-xl font-medium">Password</Text>
-        <View className="flex flex-row items-center justify-between bg-gray-100 px-3 rounded mt-1 w-full">
+        <Text style={styles.label}>Password</Text>
+        <View style={styles.passwordContainer}>
           <TextInput
             value={password}
             onChangeText={(newValue) => setPassword(newValue.trim())}
-            className="text-lg bg-transparent placeholder:text-gray-300 py-2"
-            type="text"
+            style={styles.passwordInput}
             placeholder="Enter your password"
+            placeholderTextColor="#9CA3AF"
             required
             secureTextEntry={!showPassword}
           />
@@ -97,23 +98,104 @@ const LoginScreen = ({ onLoginSuccess }) => {
             onPress={toggleShowPassword}
           />
         </View>
-        {error && <Text className="text-sm text-red-500 mt-1">{error}</Text>}
-        <TouchableOpacity
-          onPress={handleLogin}
-          className="bg-black py-2 w-full mt-6 rounded flex flex-row items-center justify-center"
-        >
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        <TouchableOpacity onPress={handleLogin} style={styles.loginButton}>
           {loading ? (
             <ActivityIndicator size="small" color="white" />
           ) : (
-            <Text className="text-white text-lg font-semibold">Login</Text>
+            <Text style={styles.loginButtonText}>Login</Text>
           )}
         </TouchableOpacity>
-        <Text onPress={goToRegister} className="mx-auto mt-4">
-          Don't have an account? <Text className="text-blue-500">Register</Text>
+        <Text onPress={goToRegister} style={styles.registerText}>
+          Don't have an account?{" "}
+          <Text style={styles.registerLink}>Register</Text>
         </Text>
       </View>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "#F8FAFC",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  container: {
+    backgroundColor: "white",
+    width: "85%",
+    paddingVertical: 30, 
+    paddingHorizontal: 22, 
+    borderRadius: 10, 
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2, 
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  label: {
+    fontSize: 18,
+    fontWeight: "500",
+    marginTop: 16, 
+  },
+  input: {
+    fontSize: 18,
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 8, 
+    paddingHorizontal: 12, 
+    borderRadius: 4, 
+    marginTop: 4,
+    width: "100%",
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#F3F4F6", 
+    paddingHorizontal: 8,
+    borderRadius: 4, 
+    marginTop: 4,
+    width: "100%",
+  },
+  passwordInput: {
+    fontSize: 18,
+    backgroundColor: "transparent",
+    paddingVertical: 8,
+    flex: 1,
+  },
+  errorText: {
+    fontSize: 14, 
+    color: "#EF4444",
+    marginTop: 4, 
+  },
+  loginButton: {
+    backgroundColor: "black",
+    paddingVertical: 8,
+    width: "100%",
+    marginTop: 24,
+    borderRadius: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loginButtonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  registerText: {
+    textAlign: "center",
+    marginTop: 16,
+  },
+  registerLink: {
+    color: "#3B82F6",
+  },
+});
 
 export default LoginScreen;

@@ -252,7 +252,7 @@ const HomeScreen = () => {
             {notes.map((note) => (
               <View
                 key={note._id}
-                className="bg-white rounded-md p-3 shadow-md"
+                className="bg-white border border-slate-200 rounded-lg p-3 shadow"
               >
                 <View className="flex flex-row justify-between items-start gap-3">
                   <Text className="font-semibold text-xl flex-shrink">
